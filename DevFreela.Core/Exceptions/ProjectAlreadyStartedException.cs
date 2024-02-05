@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace DevFreela.Core.Exceptions
 {
-    internal class ProjectAlreadyStartedException
+    public class ProjectAlreadyStartedException : Exception
     {
+        public ProjectAlreadyStartedException() : base("Project is already in started status.")
+        {
+            
+        }
     }
 }

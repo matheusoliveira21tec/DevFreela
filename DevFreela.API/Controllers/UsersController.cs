@@ -1,4 +1,6 @@
 ﻿using DevFreela.API.Models;
+using DevFreela.Application.InputModels;
+using DevFreela.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevFreela.API.Controllers;
@@ -6,47 +8,41 @@ namespace DevFreela.API.Controllers;
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Get (string query)
+    private readonly IUserService _userService;
+    public UsersController(IUserService userService)
     {
-        //buscra ou filtras
-        return Ok();
-
+        _userService = userService;
     }
+
+    // api/users/1
     [HttpGet("{id}")]
-    public IActionResult GetByID(int id)
+    public IActionResult GetById(int id)
     {
-        //buscra ou filtras
-        return Ok();
+        var user = _userService.GetUser(id);
 
-    }
-
-    [HttpPost]
-    public IActionResult Post([FromBody] CreateUserModel createUser)
-    {
-        //buscra ou filtras
-        return CreatedAtAction(nameof(GetByID), new { id = 1}, createUser);
-
-    }
-
-    [HttpPut("{id}")]
-    public IActionResult Put(int id,[FromBody] UpdateProjectModel updateProject)
-    {
-        if (updateProject.Description.Length > 50)
+        if (user == null)
         {
-            return BadRequest();
+            return NotFound();
         }
-        //buscra ou filtras
-        return NoContent();
 
+        return Ok(user);
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    // api/users
+    [HttpPost]
+    public IActionResult Post([FromBody] CreateUserInputModel inputModel)
     {
-       
-        //buscra ou filtras
-        return NoContent();
+        var id = _userService.Create(inputModel);
 
+        return CreatedAtAction(nameof(GetById), new { id = id }, inputModel);
+    }
+
+    // api/users/1/login
+    [HttpPut("{id}/login")]
+    public IActionResult Login(int id, [FromBody] LoginModel login)
+    {
+        // TODO: Para Módulo de Autenticação e Autorização
+
+        return NoContent();
     }
 }
