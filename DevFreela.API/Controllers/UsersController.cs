@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DevFreela.API.Controllers;
 
 [Route("api/users")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -35,6 +36,7 @@ public class UsersController : ControllerBase
 
     // api/users
     [HttpPost]
+    [HttpPut("login")]
     public async Task<IActionResult> Post([FromBody] CreateUserCommand command)
     {
         var id = await _mediator.Send(command);
