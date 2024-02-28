@@ -3,7 +3,6 @@ using DevFreela.Application.Commands.CreateProject;
 using DevFreela.Application.Consumers;
 using DevFreela.Application.Validators;
 using DevFreela.Core.Repositories;
-using DevFreela.Core.Services;
 using DevFreela.Infrastructure.Auth;
 using DevFreela.Infrastructure.MessageBus;
 using DevFreela.Infrastructure.Payments;
@@ -14,13 +13,19 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using DevFreela.Application;
+using DevFreela.Infrastructure;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var configuration = builder.Configuration;
 // Add services to the container.
+builder.Services
+    .AddInfrastructure(configuration)
+    .AddApplication();
 
 builder.Services.AddControllers(options => options.Filters
   .Add(typeof(ValidationFilter)));
@@ -56,40 +61,10 @@ builder.Services.AddSwaggerGen(c =>
                  });
 });
 
-builder.Services
-  .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-  .AddJwtBearer(options =>
-  {
-      options.TokenValidationParameters = new TokenValidationParameters
-      {
-          ValidateIssuer = true,
-          ValidateAudience = true,
-          ValidateLifetime = true,
-          ValidateIssuerSigningKey = true,
-
-          ValidIssuer = builder.Configuration["Jwt:Issuer"],
-          ValidAudience = builder.Configuration["Jwt:Audience"],
-          IssuerSigningKey = new SymmetricSecurityKey
-        (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-      };
-  });
-
-builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ISkillRepository, SkillRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IMessageBusService, MessageBusService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-
 builder.Services.AddFluentValidationAutoValidation()
     .AddFluentValidationClientsideAdapters()
     .AddValidatorsFromAssemblyContaining<CreateUserCommandValidator>();
 
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<CreateProjectCommand>());
-
-var connectionString = builder.Configuration.GetConnectionString("DevFreelaCs");
-builder.Services.AddHostedService<PaymentApprovedConsumer>();
-builder.Services.AddDbContext<DevFreelaDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddHttpClient();
 

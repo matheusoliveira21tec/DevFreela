@@ -1,6 +1,6 @@
 ﻿using DevFreela.Core.DTOs;
 
-namespace DevFreela.Core.Services;
+namespace DevFreela.Infrastructure.Payments;
 
 public interface IPaymentService
 {

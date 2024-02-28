@@ -1,5 +1,4 @@
 ﻿using DevFreela.Core.DTOs;
-using DevFreela.Core.Services;
 using System.Text;
 using System.Text.Json;
 
