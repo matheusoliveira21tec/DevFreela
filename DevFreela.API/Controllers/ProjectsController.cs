@@ -52,7 +52,8 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "client")]
+    // [Authorize(Roles = "client")]
+    [AllowAnonymous]
     public async Task<IActionResult> Post([FromBody] CreateProjectCommand command)
     {
 
@@ -108,13 +109,19 @@ public class ProjectsController : ControllerBase
 
     // api/projects/1/finish
     [HttpPut("{id}/finish")]
-    [Authorize(Roles = "client")]
-    public async Task<IActionResult> Finish(int id)
+    //[Authorize(Roles = "client")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Finish(int id, [FromBody] FinishProjectCommand command)
     {
-        var command = new FinishProjectCommand(id);
+        command.Id = id;
 
-        await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
-        return NoContent();
+        if (!result)
+        {
+            return BadRequest("O pagamento não pôde ser processado.");
+        }
+
+        return Accepted();
     }
 }

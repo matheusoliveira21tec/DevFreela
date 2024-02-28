@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
 
     // api/users
     [HttpPost]
-    [HttpPut("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Post([FromBody] CreateUserCommand command)
     {
         var id = await _mediator.Send(command);
