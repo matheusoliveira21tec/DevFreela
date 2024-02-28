@@ -1,5 +1,6 @@
 using DevFreela.API.Filters;
 using DevFreela.Application.Commands.CreateProject;
+using DevFreela.Application.Consumers;
 using DevFreela.Application.Validators;
 using DevFreela.Core.Repositories;
 using DevFreela.Core.Services;
@@ -87,6 +88,7 @@ builder.Services.AddFluentValidationAutoValidation()
 builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<CreateProjectCommand>());
 
 var connectionString = builder.Configuration.GetConnectionString("DevFreelaCs");
+builder.Services.AddHostedService<PaymentApprovedConsumer>();
 builder.Services.AddDbContext<DevFreelaDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddHttpClient();
