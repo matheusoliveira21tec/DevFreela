@@ -1,4 +1,5 @@
 ﻿using DevFreela.Core.DTOs;
+using DevFreela.Infrastructure.MessageBus;
 using System.Text;
 using System.Text.Json;
 

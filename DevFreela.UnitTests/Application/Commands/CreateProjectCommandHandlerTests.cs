@@ -1,6 +1,7 @@
 ﻿using DevFreela.Application.Commands.CreateProject;
 using DevFreela.Core.Entities;
 using DevFreela.Core.Repositories;
+using DevFreela.Infrastructure.Persistence;
 using Moq;
 
 namespace DevFreela.UnitTests.Application.Commands;
@@ -12,6 +13,11 @@ public class CreateProjectCommandHandlerTests
     {
         // Arrange
         var projectRepository = new Mock<IProjectRepository>();
+        var skillRepository = new Mock<ISkillRepository>();
+        var unitOfWork = new Mock<IUnitOfWork>();
+
+        unitOfWork.SetupGet(uow => uow.Projects).Returns(projectRepository.Object);
+        unitOfWork.SetupGet(uow => uow.Skills).Returns(skillRepository.Object);
 
         var createProjectCommand = new CreateProjectCommand
         {
@@ -22,7 +28,7 @@ public class CreateProjectCommandHandlerTests
             IdFreelancer = 2
         };
 
-        var createProjectCommandHandler = new CreateProjectCommandHandler(projectRepository.Object);
+        var createProjectCommandHandler = new CreateProjectCommandHandler(unitOfWork.Object);
 
         // Act
         var id = await createProjectCommandHandler.Handle(createProjectCommand, new CancellationToken());
